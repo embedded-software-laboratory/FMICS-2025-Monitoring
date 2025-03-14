@@ -2,6 +2,9 @@ class Formula:
     def __eq__(self, value):
         return str(self) == str(value)
 
+    def __hash__(self):
+        return hash(str(self))
+
 class Operator(Formula):
     def __init__(self, children: list[Formula]):
         super().__init__()

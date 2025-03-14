@@ -10,6 +10,12 @@ class MonitoredFormula:
     def __str__(self):
         return f"R[{self.formula}]{self.mode}"
 
+    def __eq__(self, other):
+        return self.formula == other.formula and self.mode == other.mode
+    
+    def __hash__(self):
+        return hash((self.formula, self.mode))
+
 class Evaluation:
     def __init__(self, formula: MonitoredFormula, verdict: Verdict):
         self.formula = formula
@@ -110,6 +116,6 @@ if __name__ == "__main__":
     for aps in [[], ["distance"], ["stop"]]:
         print(aps)
         mon.step(aps)
-        print(list(map(lambda x: str(x.formula) + ": "+ str(x.verdict[0]), mon.evaluations)))
+        print(list(map(lambda x: str(x.formula) + ": "+ str(x.verdict[0]) + x.verdict[1], mon.evaluations)))
         print(list(map(str, mon.requests)))
         print()
