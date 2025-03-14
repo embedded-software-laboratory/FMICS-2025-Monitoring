@@ -1,12 +1,12 @@
-from enum import Enum
+from enum import StrEnum
 from formula import *
 
-class Verdict(Enum):
-    TRUE = 0
-    UNKNOWN_TRUE = 1
-    UNKNOWN_FALSE = 2
-    FALSE = 3
-
+class Verdict(StrEnum):
+    TRUE = "⊤"
+    UNKNOWN_TRUE = "?⊤"
+    UNKNOWN_FALSE = "?⊥"
+    FALSE = "⊥"
+    
 # Eval tables for everything except AP
 eval_tables = {
    Not: {
