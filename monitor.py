@@ -1,5 +1,6 @@
 from formula import *
 from eval_tables import eval_tables, Verdict
+from ordered_set import OrderedSet
 
 class MonitoredFormula:
     def __init__(self, formula: Formula, mode: str):
@@ -40,7 +41,7 @@ class Monitor:
 
     def __init__(self, formula: Formula):
         self.formula = formula
-        self.requests = []
+        self.requests = OrderedSet()
         self.evaluations = []
         self.__initFN(formula)
 
@@ -49,30 +50,36 @@ class Monitor:
             if eval.formula.formula == formula:
                 return eval.verdict
         raise ValueError("Evaluation not found")
+
+    def __insert_or_replace_eval(self, eval: Evaluation):
+        for i in range(len(self.evaluations)):
+            if self.evaluations[i].formula.formula == eval.formula.formula:
+                self.evaluations[i] = eval
+                return
+        self.evaluations.append(eval)
     
     def step(self, observations: list[str]):
         # Apply evaluation rules
-        self.evaluations = []
         for req in self.requests:
             match req.formula:
                 case AP(name=name):
-                    self.evaluations.append(Evaluation(req, (Verdict.TRUE if name in observations else Verdict.FALSE, '')))
+                    self.__insert_or_replace_eval(Evaluation(req, (Verdict.TRUE if name in observations else Verdict.FALSE, '')))
                 case BinaryOperator(children=[left, right]):
                     eval_table = eval_tables[type(req.formula)][req.mode]
-                    if req.mode == "l":
-                        self.evaluations.append(Evaluation(req, eval_table[self.__get_eval(left)[0]]))
-                    elif req.mode == "r":
-                        self.evaluations.append(Evaluation(req, eval_table[self.__get_eval(right)[0]]))
+                    if req.mode == "L":
+                        self.__insert_or_replace_eval(Evaluation(req, eval_table[self.__get_eval(left)[0]]))
+                    elif req.mode == "R":
+                        self.__insert_or_replace_eval(Evaluation(req, eval_table[self.__get_eval(right)[0]]))
                     else:
-                        self.evaluations.append(Evaluation(req, eval_table[self.__get_eval(left)[0]][self.__get_eval(right)[0]]))
+                        self.__insert_or_replace_eval(Evaluation(req, eval_table[self.__get_eval(left)[0]][self.__get_eval(right)[0]]))
                 case UnaryOperator(children=[child]):
                     eval_table = eval_tables[type(req.formula)][req.mode]
-                    self.evaluations.append(Evaluation(req, eval_table[self.__get_eval(child)[0]]))
+                    self.__insert_or_replace_eval(Evaluation(req, eval_table[self.__get_eval(child)[0]]))
                 case _:
                     raise ValueError("Invalid formula")
 
         # Apply reactivation rules
-        self.requests = []
+        self.requests = OrderedSet()
         for eval in self.evaluations:
             if eval.verdict[0] == Verdict.UNKNOWN_TRUE or eval.verdict[0] == Verdict.UNKNOWN_FALSE:
                 match eval.formula.formula:
@@ -103,6 +110,6 @@ if __name__ == "__main__":
     for aps in [[], ["distance"], ["stop"]]:
         print(aps)
         mon.step(aps)
-        print(list(map(lambda x: str(x.formula) + ": "+ str(x.verdict), mon.evaluations)))
+        print(list(map(lambda x: str(x.formula) + ": "+ str(x.verdict[0]), mon.evaluations)))
         print(list(map(str, mon.requests)))
         print()
