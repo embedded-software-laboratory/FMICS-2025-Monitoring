@@ -98,25 +98,36 @@ class Monitor:
                 raise ValueError("Invalid formula")
 
         # Apply reactivation rules
+        old_requests = self.requests
         self.requests = OrderedSet()
+        def update_or_insert(f):
+            if f not in old_requests:
+                self.requests.add(f)
+            else:
+                for req in old_requests:
+                    if req == f:
+                        self.requests.add(req)
+                        req.mode = f.mode
+                        req.depends_on = f.depends_on
+                        break
         for eval in self.evaluations:
             if eval.verdict[0] == Verdict.UNKNOWN_TRUE or eval.verdict[0] == Verdict.UNKNOWN_FALSE:
                 if isinstance(eval.formula.formula, Not):
-                    self.requests.append(MonitoredFormula(eval.formula.formula, "", eval.formula.step, eval.formula.depends_on))
+                    update_or_insert(MonitoredFormula(eval.formula.formula, "", eval.formula.step, eval.formula.depends_on))
                 elif isinstance(eval.formula.formula, (And, Or)):
-                    self.requests.append(MonitoredFormula(eval.formula.formula, eval.verdict[1], eval.formula.step, eval.formula.depends_on))
+                    update_or_insert(MonitoredFormula(eval.formula.formula, eval.verdict[1], eval.formula.step, eval.formula.depends_on))
                 elif isinstance(eval.formula.formula, (G, F)):
                     new_inits = self.__initFN(eval.formula.formula.children[0], eval.formula.step + 1)
-                    self.requests.append(MonitoredFormula(eval.formula.formula, "", eval.formula.step, eval.formula.depends_on.union(new_inits)))
+                    update_or_insert(MonitoredFormula(eval.formula.formula, "", eval.formula.step, eval.formula.depends_on.union(new_inits)))
                 elif isinstance(eval.formula.formula, (X, W)):
                     depends = eval.formula.depends_on
                     if eval.formula.mode == "":
                         depends = depends.union(self.__initFN(eval.formula.formula.children[0], eval.formula.step + 1))
-                    self.requests.append(MonitoredFormula(eval.formula.formula, eval.verdict[1], eval.formula.step, depends))
+                    update_or_insert(MonitoredFormula(eval.formula.formula, eval.verdict[1], eval.formula.step, depends))
                 elif isinstance(eval.formula.formula, U):
                     self.__initFN(eval.formula.formula.children[0])
                     self.__initFN(eval.formula.formula.children[1])
-                    self.requests.append(MonitoredFormula(eval.formula.formula, eval.verdict[1]))
+                    update_or_insert(MonitoredFormula(eval.formula.formula, eval.verdict[1]))
                 else:
                     raise ValueError("Invalid formula")
 
