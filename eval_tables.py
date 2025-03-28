@@ -1,53 +1,52 @@
-from enum import StrEnum
 from formula import *
 
-class Verdict(StrEnum):
-    TRUE = "⊤"
-    UNKNOWN_TRUE = "?⊤"
-    UNKNOWN_FALSE = "?⊥"
-    FALSE = "⊥"
-    
+class Verdict:
+    TRUE = u"T"
+    UNKNOWN_TRUE = u"?T"
+    UNKNOWN_FALSE = u"?F"
+    FALSE = u"F"
+
 # Eval tables for everything except AP
 eval_tables = {
-   Not: {
-       '': {
+    Not: {
+        '': {
             Verdict.TRUE: (Verdict.FALSE, ''),
             Verdict.FALSE: (Verdict.TRUE, ''),
             Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_FALSE, ''),
             Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_TRUE, '')
-       }
-   },
-   And: {
-       '': {
-           Verdict.TRUE: {
+        }
+    },
+    And: {
+        '': {
+            Verdict.TRUE: {
                 Verdict.TRUE: (Verdict.TRUE, ''),
                 Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_TRUE, 'R'),
                 Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, 'R'),
                 Verdict.FALSE: (Verdict.FALSE, '')
-           },
-           Verdict.UNKNOWN_TRUE: {
+            },
+            Verdict.UNKNOWN_TRUE: {
                 Verdict.TRUE: (Verdict.UNKNOWN_TRUE, 'L'),
                 Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_TRUE, ''),
                 Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, ''),
                 Verdict.FALSE: (Verdict.FALSE, '')
-           },
-              Verdict.UNKNOWN_FALSE: {
-                 Verdict.TRUE: (Verdict.UNKNOWN_FALSE, 'L'),
-                 Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_FALSE, ''),
-                 Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, ''),
-                 Verdict.FALSE: (Verdict.FALSE, '')
-              },
+            },
+            Verdict.UNKNOWN_FALSE: {
+                Verdict.TRUE: (Verdict.UNKNOWN_FALSE, 'L'),
+                Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_FALSE, ''),
+                Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, ''),
+                Verdict.FALSE: (Verdict.FALSE, '')
+            },
             Verdict.FALSE: {
-                    Verdict.TRUE: (Verdict.FALSE, ''),
-                    Verdict.UNKNOWN_TRUE: (Verdict.FALSE, ''),
-                    Verdict.UNKNOWN_FALSE: (Verdict.FALSE, ''),
-                    Verdict.FALSE: (Verdict.FALSE, '')
+                Verdict.TRUE: (Verdict.FALSE, ''),
+                Verdict.UNKNOWN_TRUE: (Verdict.FALSE, ''),
+                Verdict.UNKNOWN_FALSE: (Verdict.FALSE, ''),
+                Verdict.FALSE: (Verdict.FALSE, '')
             }
-       },
-       'L': {
-           Verdict.TRUE: (Verdict.TRUE, ''),
-           Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_TRUE, 'L'),
-           Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, 'L'),
+        },
+        'L': {
+            Verdict.TRUE: (Verdict.TRUE, ''),
+            Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_TRUE, 'L'),
+            Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, 'L'),
             Verdict.FALSE: (Verdict.FALSE, '')
         },
         'R': {
@@ -56,8 +55,8 @@ eval_tables = {
             Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, 'R'),
             Verdict.FALSE: (Verdict.FALSE, '')
         }
-   },
-   Or: {
+    },
+    Or: {
         '': {
             Verdict.TRUE: {
                 Verdict.TRUE: (Verdict.TRUE, ''),
@@ -96,8 +95,8 @@ eval_tables = {
             Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, 'R'),
             Verdict.FALSE: (Verdict.FALSE, '')
         }
-   },
-   W: {
+    },
+    W: {
         '': {
             Verdict.TRUE: (Verdict.UNKNOWN_TRUE, 'M'),
             Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_TRUE, 'M'),
@@ -112,12 +111,7 @@ eval_tables = {
         }
     },
     X: {
-        '': {
-            Verdict.TRUE: (Verdict.UNKNOWN_FALSE, 'M'),
-            Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_FALSE, 'M'),
-            Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, 'M'),
-            Verdict.FALSE: (Verdict.UNKNOWN_FALSE, 'M')
-        },
+        '': (Verdict.UNKNOWN_FALSE, 'M'),
         'M': {
             Verdict.TRUE: (Verdict.TRUE, ''),
             Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_FALSE, ''),
