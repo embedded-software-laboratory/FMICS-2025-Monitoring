@@ -113,10 +113,10 @@ eval_tables = {
     X: {
         '': (Verdict.UNKNOWN_FALSE, 'M'),
         'M': {
-            Verdict.TRUE: (Verdict.TRUE, ''),
-            Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_FALSE, ''),
-            Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, ''),
-            Verdict.FALSE: (Verdict.FALSE, '')
+            Verdict.TRUE: (Verdict.TRUE, 'M'),
+            Verdict.UNKNOWN_TRUE: (Verdict.UNKNOWN_FALSE, 'M'),
+            Verdict.UNKNOWN_FALSE: (Verdict.UNKNOWN_FALSE, 'M'),
+            Verdict.FALSE: (Verdict.FALSE, 'M')
         }
     },
     G: {
